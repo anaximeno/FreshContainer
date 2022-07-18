@@ -48,7 +48,7 @@ char* stack_memory() {
 }
 
 void clone_process(int (func) (void*), int flags) {
-    int pid = clone(func, stack_memory(), flags, NULL);
+    clone(func, stack_memory(), flags, NULL);
     wait(0);
 }
 
@@ -82,7 +82,7 @@ int run_sh(void *args) {
 }
 
 int jail(void* args) {
-    printf("child process: %d\n", getpid());
+    printf("jailed child process PID: %d\n", getpid());
 
     setup_variables();
     setup_root("./root");

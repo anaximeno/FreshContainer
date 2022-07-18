@@ -6,7 +6,7 @@
 #include <sys/wait.h>
 
 int main() {
-    printf("parent %d\n", getpid());
+    printf("PID: %d\n", getpid());
 
     limit_process_creation();
 
