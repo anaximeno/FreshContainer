@@ -8,6 +8,7 @@
 #include <sched.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <sys/mount.h>
 
 #define STACK_SIZE 65536 // 16 bits - 2 bytes
 
@@ -22,6 +23,11 @@ char* stack_memory() {
     // return a pointer to the end of the array
     // since the stack grows backward.
     return stack + STACK_SIZE;
+}
+
+void clone_process(int (func) (void*), int flags) {
+    int pid = clone(func, stack_memory(), flags, NULL);
+    wait(0);
 }
 
 int run(const char* name) {
@@ -48,31 +54,27 @@ void setup_variables() {
     setenv("PATH", "/bin/:/sbin/:/usr/bin:/usr/sbin", 0);
 }
 
+int run_sh(void *args) {
+    run("/bin/sh");
+}
+
 int jail(void* args) {
     printf("child process: %d\n", getpid());
 
     setup_variables();
     setup_root("./root");
 
-    run("/bin/sh");
+    mount("proc", "/proc", "proc", 0, 0);
+
+    clone_process(run_sh, SIGCHLD);
+
+    umount("/proc");
     return EXIT_SUCCESS;
 }
 
 int main() {
-    printf("Hello, World (parent)\n");
     printf("parent %d\n", getpid());
-
-    // clone this proccess, creating a child process running jail
-    int pid = clone(jail, stack_memory(), CLONE_NEWPID | CLONE_NEWUTS | SIGCHLD, NULL);
-
-    if (pid < 0) {
-        printf("Could not create a subprocess\n");
-        exit(EXIT_FAILURE);
-    }
-
-    // wait for the child proccess to finish executing
-    wait(0);
-
+    clone_process(jail, CLONE_NEWPID | CLONE_NEWUTS | SIGCHLD);
     return EXIT_SUCCESS;
 }
 
