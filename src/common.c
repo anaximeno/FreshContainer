@@ -57,14 +57,16 @@ int run(const char* name) {
     // and end with a NULL pointer.
     char* _args[] = {(char*) name, NULL};
 
-    execvp(name, _args);
+    int res = execvp(name, _args);
+
+    if (res < 0) {
+      return EXIT_FAILURE;
+    }
 
     return EXIT_SUCCESS;
 }
 
 void setup_root(const char* folder) {
-    // the file system used for test was downloded with the link bellow:
-    //  - http://nl.alpinelinux.org/alpine/v3.7/releases/x86_64/alpine-minirootfs-3.7.0-x86_64.tar.gz
     chroot(folder);
     chdir("/");
 }
@@ -76,7 +78,7 @@ void setup_variables() {
 }
 
 int run_sh(void *args) {
-    run("/bin/sh");
+    return run("/bin/sh");
 }
 
 int jail(void* args) {
