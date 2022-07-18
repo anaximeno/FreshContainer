@@ -1,7 +1,7 @@
 #ifndef _CONTAINER_LEARN
 #define _CONTAINER_LEARN
 
-#define _GNU_SOURCE 1
+#define _GNU_SOURCE
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -28,15 +28,33 @@ int run(const char* name) {
     // The args array must init with the name of the program
     // and end with a NULL pointer.
     char* _args[] = {(char*) name, NULL};
+
     execvp(name, _args);
+
     return EXIT_SUCCESS;
 }
 
-int jail(void* args) {
-    // remove all env variables
+void setup_root(const char* folder) {
+    // the file system used for test was downloded with the link bellow:
+    //  - http://nl.alpinelinux.org/alpine/v3.7/releases/x86_64/alpine-minirootfs-3.7.0-x86_64.tar.gz
+    chroot(folder);
+    chdir("/");
+}
+
+void setup_variables() {
     clearenv();
+
+    setenv("TERM", "xterm-256color", 0);
+    setenv("PATH", "/bin/:/sbin/:/usr/bin:/usr/sbin", 0);
+}
+
+int jail(void* args) {
     printf("child process: %d\n", getpid());
-    run("/bin/bash");
+
+    setup_variables();
+    setup_root("./root");
+
+    run("/bin/sh");
     return EXIT_SUCCESS;
 }
 
