@@ -11,13 +11,15 @@
 #include <stdio.h>
 #include <sched.h>
 
-void write_rule(const char* path, const char* value) {
+void write_rule(const char* path, const char* value)
+{
     int fp = open(path, O_WRONLY | O_APPEND);
     write(fp, value, strlen(value));
     close(fp);
 }
 
-void limit_process_creation() {
+void limit_process_creation()
+{
     char* pid = (char*) malloc(20 * sizeof(char));
 
     mkdir(CGROUP_FOLDER, S_IRUSR | S_IWUSR);
@@ -34,7 +36,8 @@ void limit_process_creation() {
     free(pid);
 }
 
-char* stack_memory() {
+char* stack_memory()
+{
     char* stack = (char*) malloc(STACK_SIZE * sizeof(char));
 
     if (stack == NULL) {
@@ -47,41 +50,46 @@ char* stack_memory() {
     return stack + STACK_SIZE;
 }
 
-void clone_process(int (func) (void*), int flags) {
+void clone_process(int (func) (void*), int flags)
+{
     clone(func, stack_memory(), flags, NULL);
     wait(0);
 }
 
-int run(const char* name) {
+int run(const char* name)
+{
     // The args array must init with the name of the program
     // and end with a NULL pointer.
     char* _args[] = {(char*) name, NULL};
 
     int res = execvp(name, _args);
 
-    if (res < 0) {
+    if (res < 0)
       return EXIT_FAILURE;
-    }
 
     return EXIT_SUCCESS;
 }
 
-void setup_root(const char* folder) {
+void setup_root(const char* folder)
+{
     chroot(folder);
     chdir("/");
 }
 
-void setup_variables() {
+void setup_variables()
+{
     clearenv(); /* Clears the env variables */
     setenv("TERM", "xterm-256color", 0);
     setenv("PATH", "/bin/:/sbin/:/usr/bin:/usr/sbin", 0);
 }
 
-int run_sh(void *args) {
+int run_sh(void *args)
+{
     return run("/bin/sh");
 }
 
-int jail(void* args) {
+int jail(void* args)
+{
     printf("jailed child process PID: %d\n", getpid());
 
     setup_variables();
