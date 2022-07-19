@@ -23,3 +23,7 @@ Run the program using:
 ```bash
 sudo ./container
 ```
+
+### References
+
+* [1] “Creating Your Own Containers - Nube.” https://cesarvr.github.io/post/2018-05-22-create-containers/ (accessed Jul. 17, 2022).
