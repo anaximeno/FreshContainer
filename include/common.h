@@ -29,7 +29,7 @@ void limit_process_creation();
 char* stack_memory();
 
 /* Created a new subprocess by cloning the parent process context. */
-void clone_process(int (func) (void*), int flags);
+int clone_process(int (func) (void*), int flags);
 
 /* Runs a specific script inside the container.
  * It depends on the scripts available on the container environment.

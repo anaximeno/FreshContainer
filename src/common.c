@@ -50,10 +50,11 @@ char* stack_memory()
     return stack + STACK_SIZE;
 }
 
-void clone_process(int (func) (void*), int flags)
+int clone_process(int (func) (void*), int flags)
 {
-    clone(func, stack_memory(), flags, NULL);
+    int result = clone(func, stack_memory(), flags, NULL);
     wait(0);
+    return result;
 }
 
 int run(const char* name)

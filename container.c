@@ -7,11 +7,16 @@
 
 int main()
 {
+    int result;
+
     printf("PID: %d\n", getpid());
 
     limit_process_creation();
 
-    clone_process(jail, CLONE_NEWPID | CLONE_NEWUTS | SIGCHLD);
+    result = clone_process(jail, CLONE_NEWPID | CLONE_NEWUTS | SIGCHLD);
+
+    if (result < 0)
+        printf("The cloning didn't work, try run using root.\n");
 
     return EXIT_SUCCESS;
 }
